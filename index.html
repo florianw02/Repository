@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réseau Salariat — Démo application</title>
+  <style>
+    :root{--bg:#f8fafc;--card:#ffffff;--text:#0f172a;--muted:#475569;--line:#e2e8f0;--strong:#111827}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1180px;margin:0 auto;padding:24px}
+    .hero,.card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+    .hero{padding:28px;margin-bottom:16px}
+    h1,h2,h3,p{margin:0} h1{font-size:42px;line-height:1.05;margin-top:10px} h2{font-size:28px;margin-bottom:8px} h3{font-size:18px}
+    .sub{color:var(--muted);max-width:760px;line-height:1.65;margin-top:10px}
+    .badge{display:inline-block;background:var(--strong);color:#fff;border-radius:999px;padding:8px 12px;font-size:13px}
+    .pills,.nav,.grid,.cols{display:flex;gap:12px;flex-wrap:wrap}
+    .pill,.nav button,.small-btn,.tag{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;color:var(--text)}
+    .nav{margin-bottom:16px}.nav button{cursor:pointer}.nav button.active{background:var(--strong);color:#fff;border-color:var(--strong)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.col-8{grid-column:span 8}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+    .card{padding:20px}.muted{color:var(--muted)} .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+    .stat{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fff}.stat strong{display:block;font-size:28px;margin-top:10px}
+    .list{display:grid;gap:12px}.item{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fff}.item.active{background:#0f172a;color:#fff;border-color:#0f172a}.item.active .muted{color:#cbd5e1}
+    .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.stack{display:grid;gap:10px}.hidden{display:none}
+    .small-btn{cursor:pointer;border-radius:12px;padding:10px 12px}.small-btn.primary{background:var(--strong);color:#fff;border-color:var(--strong)}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:11px 12px;font:inherit;background:#fff} textarea{min-height:86px;resize:vertical}
+    pre{white-space:pre-wrap;word-break:break-word;border:1px solid var(--line);background:#f8fafc;border-radius:18px;padding:14px;font-size:12px;line-height:1.55;overflow:auto}
+    .tag{font-size:12px;padding:6px 10px}.top-gap{margin-top:14px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}.col-8,.col-4,.col-6,.col-12{grid-column:span 1}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:34px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="badge">Démo publique — application Réseau Salariat</span>
+      <h1>Réseau Salariat</h1>
+      <p class="sub">Une application minimale pensée pour relier lecture, groupes locaux, rencontres, campagnes, ressources de base et accueil militant, sans devenir un réseau social bavard ni un substitut à la présence réelle.</p>
+      <div class="pills top-gap">
+        <span class="pill">Trouver un groupe</span>
+        <span class="pill">Venir à une rencontre</span>
+        <span class="pill">Rejoindre une campagne</span>
+        <span class="pill">Mieux accueillir</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="muted">Groupes visibles</span><strong>3</strong></div>
+        <div class="stat"><span class="muted">Rendez-vous à venir</span><strong>5</strong></div>
+        <div class="stat"><span class="muted">Campagnes actives</span><strong>2</strong></div>
+        <div class="stat"><span class="muted">Nouveaux contacts</span><strong>1</strong></div>
+      </div>
+    </section>
+
+    <div class="nav" id="nav"></div>
+
+    <section id="view-accueil" class="view grid"></section>
+    <section id="view-groupes" class="view hidden grid"></section>
+    <section id="view-agenda" class="view hidden grid"></section>
+    <section id="view-campagnes" class="view hidden grid"></section>
+    <section id="view-ressources" class="view hidden grid"></section>
+    <section id="view-coordination" class="view hidden grid"></section>
+    <section id="view-technique" class="view hidden grid"></section>
+  </div>
+
+<script>
+const groups=[
+{id:'g1',name:'Réseau Salariat Paris Est',area:'Paris 11e / Montreuil',city:'Paris',welcome:'Réunion d’accueil ouverte chaque 1er mercredi du mois.',contact:'Camille — parisest@reseau-salariat.test',tags:['Accueil','Formation','Campagnes'],info:['Le lieu est accessible en transports en commun.','Les nouvelles personnes sont accueillies à l’entrée.']},
+{id:'g2',name:'Réseau Salariat Lyon Centre',area:'Lyon 1er / Croix-Rousse',city:'Lyon',welcome:'Temps de découverte tous les quinze jours.',contact:'Samir — lyoncentre@reseau-salariat.test',tags:['Découverte','Lecture'],info:['Lecture collective une fois par mois.','Le groupe accueille aussi des personnes sans expérience militante.']},
+{id:'g3',name:'Réseau Salariat Marseille Sud',area:'Castellane / Prado',city:'Marseille',welcome:'Accueil avant chaque réunion publique.',contact:'Nora — marseillesud@reseau-salariat.test',tags:['Campagne','Réunion publique'],info:['Une personne référente peut appeler avant la première venue.','Les actions de campagne sont ouvertes aux nouvelles personnes.']}
+];
+const events=[
+{id:'e1',title:'Première rencontre : comprendre le salaire à vie',date:'14 avril 2026',time:'19:00',city:'Paris',type:'Découverte',group:'g1',location:'Maison des associations, salle 2',description:'Temps d’accueil pour découvrir les bases du Réseau Salariat.',first:'Arrive 10 minutes avant. Aucun prérequis.'},
+{id:'e2',title:'Parcours découverte #1',date:'16 avril 2026',time:'18:30',city:'Lyon',type:'Formation',group:'g2',location:'Local coopératif, rue Burdeau',description:'Premier temps d’un parcours court liant lecture, discussion et présence dans un groupe.',first:'Tu peux venir sans avoir tout lu.'},
+{id:'e3',title:'Réunion locale de coordination',date:'18 avril 2026',time:'19:30',city:'Paris',type:'Réunion locale',group:'g1',location:'Maison des associations, salle 1',description:'Préparation des activités du mois et répartition des tâches d’accueil.'},
+{id:'e4',title:'Campagne locale : tournée d’information',date:'20 avril 2026',time:'17:30',city:'Marseille',type:'Campagne',group:'g3',location:'Départ place Castellane',description:'Action ouverte pour rejoindre une campagne locale.',first:'Un binôme d’accueil présente le déroulé avant le départ.'},
+{id:'e5',title:'Lecture d’accueil : qualification personnelle',date:'24 avril 2026',time:'18:45',city:'Paris',type:'Formation',group:'g1',location:'Bibliothèque autogérée',description:'Séance courte pour reprendre les notions de base avec support et discussion.'}
+];
+const campaigns=[
+{id:'c1',title:'Faire connaître la qualification personnelle',level:'Nationale',next:'Webinaire d’entrée le 22 avril à 19:00',entry:'Participer à une réunion d’introduction ou rejoindre un groupe local impliqué.',desc:'Campagne de diffusion, d’éducation populaire et d’ancrage local.'},
+{id:'c2',title:'Cycle local d’accueil et de lecture',level:'Locale',next:'Séance de lancement à Marseille le 20 avril',entry:'Venir à la première rencontre et se signaler à l’accueil.',desc:'Relier premières lectures, rencontres réelles et engagement progressif.'}
+];
+const resources=[
+['Comprendre le Réseau Salariat en 10 minutes','Présentation synthétique du cadre politique.'],
+['Venir à une première rencontre','À quoi s’attendre et comment poursuivre.'],
+['Repères sur le salaire à vie','Quelques notions de base pour entrer dans les discussions.'],
+['Charte d’accueil local','Repères partagés pour accueillir et relancer.']
+];
+const leads=[
+['Élise Martin','Paris','Nouveau contact','Envoyer le message d’accueil et proposer la rencontre du 14 avril.'],
+['Romain Petit','Lyon','Venue prévue','Confirmer l’horaire et envoyer le guide première rencontre.'],
+['Nadia Benali','Marseille','À relancer','Proposer la tournée d’information du 20 avril.']
+];
+const tabs=[['accueil','Accueil'],['groupes','Groupes'],['agenda','Agenda'],['campagnes','Campagnes'],['ressources','Ressources'],['coordination','Coordination'],['technique','Socle technique']];
+let selectedGroup='g1',selectedEvent='e1';
+function groupById(id){return groups.find(g=>g.id===id)}; function eventById(id){return events.find(e=>e.id===id)};
+function nav(){document.getElementById('nav').innerHTML=tabs.map(([id,label],i)=>`<button class="${i===0?'active':''}" data-tab="${id}">${label}</button>`).join('');document.querySelectorAll('#nav button').forEach(btn=>btn.onclick=()=>showTab(btn.dataset.tab));}
+function showTab(tab){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('view-'+tab).classList.remove('hidden');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));}
+function renderAccueil(){document.getElementById('view-accueil').innerHTML=`
+  <div class="card col-8"><h2>Découvrir</h2><p class="muted">Le point d’entrée principal : rendre visible la vie locale et guider vers une première action concrète.</p><div class="list top-gap">
+  <div class="item"><h3>1. Comprendre</h3><p class="muted top-gap">Une entrée courte pour saisir les bases sans se perdre.</p></div>
+  <div class="item"><h3>2. Trouver un groupe</h3><p class="muted top-gap">Identifier un point d’entrée local et concret en quelques gestes.</p></div>
+  <div class="item"><h3>3. Préparer la première venue</h3><p class="muted top-gap">Recevoir les informations utiles et réduire l’incertitude avant de venir.</p></div>
+  </div></div>
+  <div class="card col-4"><h2>Principes</h2><div class="stack top-gap"><div class="item">Le centre reste le groupe réel.</div><div class="item">L’app oriente, elle ne remplace pas.</div><div class="item">Aucune logique de likes, badges ou profils mis en avant.</div></div></div>`;}
+function renderGroupes(){const list=groups.map(g=>`<div class="item ${g.id===selectedGroup?'active':''}" onclick="selectGroup('${g.id}')"><div class="row"><div><h3>${g.name}</h3><p class="muted top-gap">${g.area} · ${g.city}</p></div><div>${g.tags.map(t=>`<span class='tag'>${t}</span>`).join(' ')}</div></div></div>`).join(''); const g=groupById(selectedGroup); const related=events.filter(e=>e.group===g.id).map(e=>`<div class='item'><strong>${e.title}</strong><p class='muted top-gap'>${e.date} · ${e.time}</p></div>`).join(''); document.getElementById('view-groupes').innerHTML=`<div class='card col-7'><h2>Je cherche un groupe</h2><p class='muted'>Recherche locale simple, avec fiche directement utile.</p><div class='list top-gap'>${list}</div></div><div class='card col-5'><h2>${g.name}</h2><p class='muted'>${g.welcome}</p><div class='stack top-gap'>${g.info.map(i=>`<div class='item'>${i}</div>`).join('')}<div class='item'><strong>Contact d’accueil</strong><p class='muted top-gap'>${g.contact}</p></div><div class='item'><strong>Rendez-vous à venir</strong><div class='stack top-gap'>${related}</div></div></div></div>`;}
+function selectGroup(id){selectedGroup=id;renderGroupes();}
+function renderAgenda(){const list=events.map(e=>`<div class="item ${e.id===selectedEvent?'active':''}" onclick="selectEvent('${e.id}')"><div class='row'><div><h3>${e.title}</h3><p class='muted top-gap'>${e.date} · ${e.time} · ${e.city}</p></div><span class='tag'>${e.type}</span></div></div>`).join(''); const e=eventById(selectedEvent); document.getElementById('view-agenda').innerHTML=`<div class='card col-7'><h2>Je viens à une première rencontre</h2><p class='muted'>Agenda utile, filtrable, avec préparation concrète à la venue.</p><div class='list top-gap'>${list}</div></div><div class='card col-5'><h2>${e.title}</h2><p class='muted'>${e.description}</p><div class='stack top-gap'><div class='item'><strong>Lieu</strong><p class='muted top-gap'>${e.location}</p></div>${e.first?`<div class='item'><strong>Première venue</strong><p class='muted top-gap'>${e.first}</p></div>`:''}<button class='small-btn primary'>Je viens à cette rencontre</button></div></div>`;}
+function selectEvent(id){selectedEvent=id;renderAgenda();}
+function renderCampagnes(){document.getElementById('view-campagnes').innerHTML=campaigns.map(c=>`<div class='card col-6'><div class='row'><div><h2>${c.title}</h2><p class='muted'>${c.level}</p></div><span class='tag'>${c.level}</span></div><p class='muted top-gap'>${c.desc}</p><div class='stack top-gap'><div class='item'><strong>Point d’entrée</strong><p class='muted top-gap'>${c.entry}</p></div><div class='item'><strong>Prochaine action</strong><p class='muted top-gap'>${c.next}</p></div><button class='small-btn primary'>Je rejoins cette campagne</button></div></div>`).join('');}
+function renderRessources(){document.getElementById('view-ressources').innerHTML=`<div class='card col-8'><h2>Ressources de base</h2><p class='muted'>Un socle court pour aider à comprendre, venir, poursuivre et accueillir.</p><div class='list top-gap'>${resources.map(r=>`<div class='item'><strong>${r[0]}</strong><p class='muted top-gap'>${r[1]}</p></div>`).join('')}</div></div><div class='card col-4'><h2>Transmission militante</h2><div class='stack top-gap'><div class='item'>Chaque ressource doit renvoyer vers une rencontre, une campagne, un parcours ou un rôle dans un groupe.</div><div class='item'>L’application ne cherche pas à enfermer la formation dans un parcours numérique autonome.</div></div></div>`;}
+function renderCoordination(){document.getElementById('view-coordination').innerHTML=`<div class='card col-7'><h2>J’aide à accueillir</h2><p class='muted'>Suivi léger des nouvelles personnes, sans transformer l’accueil en CRM lourd.</p><div class='list top-gap'>${leads.map(l=>`<div class='item'><div class='row'><div><strong>${l[0]}</strong><p class='muted top-gap'>${l[1]} · ${l[2]}</p></div><span class='tag'>${l[2]}</span></div><p class='muted top-gap'>${l[3]}</p><div class='top-gap'><button class='small-btn'>Prévoir venue</button> <button class='small-btn'>Marquer venue</button> <button class='small-btn'>Relancer</button></div></div>`).join('')}</div></div><div class='card col-5'><h2>Garde-fous</h2><div class='stack top-gap'><div class='item'>Suivi léger des premiers contacts seulement.</div><div class='item'>Pas de scoring, pas de réputation, pas de surveillance.</div><div class='item'>Une donnée, un usage, une raison politique claire.</div></div></div>`;}
+function renderTechnique(){document.getElementById('view-technique').innerHTML=`<div class='card col-6'><h2>Architecture minimale</h2><div class='list top-gap'><div class='item'><strong>Frontend</strong><p class='muted top-gap'>Web app responsive, mobile-first, sobre.</p></div><div class='item'><strong>Backend</strong><p class='muted top-gap'>API REST simple avec authentification par rôles.</p></div><div class='item'><strong>Données</strong><p class='muted top-gap'>PostgreSQL, tables courtes, relations lisibles.</p></div></div></div><div class='card col-6'><h2>API MVP</h2><pre>GET /groups
+GET /events
+GET /campaigns
+GET /resources
+POST /events/:id/interest
+GET /welcome-leads
+PATCH /welcome-leads/:id
+POST /events
+POST /notices</pre></div><div class='card col-12'><h2>Décision de déploiement</h2><div class='list top-gap'><div class='item'><strong>Point de départ recommandé</strong><p class='muted top-gap'>Next.js web responsive, puis PWA si l’usage le justifie. Wrapper mobile seulement plus tard.</p></div></div></div>`;}
+nav(); renderAccueil(); renderGroupes(); renderAgenda(); renderCampagnes(); renderRessources(); renderCoordination(); renderTechnique();
+</script>
+</body>
+</html>
