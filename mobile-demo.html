@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réseau Salariat — Démo mobile</title>
+  <style>
+    :root{
+      --bg:#e2e8f0;
+      --phone:#ffffff;
+      --screen:#f8fafc;
+      --card:#ffffff;
+      --line:#e2e8f0;
+      --text:#0f172a;
+      --muted:#475569;
+      --strong:#111827;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#e2e8f0,#cbd5e1);color:var(--text)}
+    .page{min-height:100vh;padding:20px;display:flex;align-items:flex-start;justify-content:center}
+    .phone{width:min(430px,100%);background:var(--phone);border:1px solid #cbd5e1;border-radius:38px;box-shadow:0 24px 60px rgba(15,23,42,.18);overflow:hidden}
+    .top{position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);padding:18px 16px 12px;border-bottom:1px solid var(--line);z-index:5}
+    .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);font-weight:700}
+    h1,h2,h3,p{margin:0}
+    h1{font-size:28px;line-height:1.05;margin-top:6px}
+    h2{font-size:20px;line-height:1.2}
+    h3{font-size:16px;line-height:1.35}
+    .sub{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.6}
+    .badge{display:inline-flex;align-items:center;border-radius:999px;background:var(--strong);color:#fff;padding:6px 10px;font-size:12px;font-weight:600}
+    .screen{min-height:740px;background:var(--screen);padding:12px 12px 96px}
+    .stack{display:grid;gap:12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:16px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+    .pill-row,.tag-row{display:flex;gap:8px;flex-wrap:wrap}
+    .pill,.tag{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;background:#fff}
+    .tag{padding:5px 9px;color:#334155;background:#f8fafc}
+    .primary,.secondary,.ghost{width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);font:inherit;cursor:pointer}
+    .primary{background:var(--strong);color:#fff;border-color:var(--strong)}
+    .secondary{background:#fff;color:var(--text)}
+    .ghost{background:#f8fafc;color:var(--text)}
+    .list{display:grid;gap:10px}
+    .item{border:1px solid var(--line);border-radius:22px;padding:14px;background:#fff}
+    .item.active{background:#0f172a;color:#fff;border-color:#0f172a}
+    .item.active .muted{color:#cbd5e1}
+    .muted{color:var(--muted)}
+    .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .small-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .small-btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;font:inherit;cursor:pointer}
+    .search{width:100%;border:1px solid var(--line);background:#fff;border-radius:18px;padding:12px 14px;font:inherit}
+    .bottom{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(414px,calc(100vw - 24px));padding:0 8px}
+    .nav{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:28px;padding:8px;box-shadow:0 10px 30px rgba(15,23,42,.14)}
+    .nav button{min-height:62px;border:none;background:transparent;border-radius:20px;font:inherit;font-size:11px;color:#475569;cursor:pointer;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+    .nav button.active{background:#0f172a;color:#fff}
+    .icon{font-size:17px;line-height:1}
+    .hidden{display:none}
+    pre{white-space:pre-wrap;word-break:break-word;border:1px solid var(--line);background:#f8fafc;border-radius:18px;padding:12px;font-size:12px;line-height:1.55;overflow:auto}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="phone">
+      <div class="top">
+        <div class="row">
+          <div>
+            <div class="eyebrow">Réseau Salariat</div>
+            <h1>Application mobile</h1>
+          </div>
+          <div class="badge">Démo</div>
+        </div>
+        <p class="sub">Prototype mobile-first centré sur les groupes, les rencontres, les campagnes et l’accueil militant.</p>
+      </div>
+      <div class="screen">
+        <section id="view-accueil" class="view stack"></section>
+        <section id="view-groupes" class="view hidden stack"></section>
+        <section id="view-agenda" class="view hidden stack"></section>
+        <section id="view-campagnes" class="view hidden stack"></section>
+        <section id="view-ressources" class="view hidden stack"></section>
+        <section id="view-accueilLocal" class="view hidden stack"></section>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="nav" id="nav"></div>
+  </div>
+
+<script>
+const groups=[
+{id:'g1',name:'Paris Est',city:'Paris',area:'11e / Montreuil',welcome:'Réunion d’accueil ouverte chaque 1er mercredi du mois.',contact:'Camille — parisest@reseau-salariat.test',tags:['Accueil','Formation']},
+{id:'g2',name:'Lyon Centre',city:'Lyon',area:'Croix-Rousse',welcome:'Temps de découverte tous les quinze jours.',contact:'Samir — lyoncentre@reseau-salariat.test',tags:['Découverte','Lecture']},
+{id:'g3',name:'Marseille Sud',city:'Marseille',area:'Castellane / Prado',welcome:'Accueil avant chaque réunion publique.',contact:'Nora — marseillesud@reseau-salariat.test',tags:['Campagne','Réunion publique']}
+];
+const events=[
+{id:'e1',title:'Première rencontre : comprendre le salaire à vie',date:'14 avril 2026',time:'19:00',city:'Paris',type:'Découverte',group:'g1',location:'Maison des associations, salle 2',description:'Temps d’accueil pour découvrir les bases du Réseau Salariat.',first:'Arrive 10 minutes avant. Une personne d’accueil sera présente à l’entrée.'},
+{id:'e2',title:'Parcours découverte #1',date:'16 avril 2026',time:'18:30',city:'Lyon',type:'Formation',group:'g2',location:'Local coopératif, rue Burdeau',description:'Premier temps d’un parcours court pour lier lecture, discussion et présence dans un groupe.',first:'Tu peux venir sans avoir tout lu.'},
+{id:'e3',title:'Campagne locale : tournée d’information',date:'20 avril 2026',time:'17:30',city:'Marseille',type:'Campagne',group:'g3',location:'Départ place Castellane',description:'Action ouverte pour rejoindre une campagne locale.',first:'Un binôme d’accueil présentera le déroulé avant le départ.'}
+];
+const campaigns=[
+{id:'c1',title:'Faire connaître la qualification personnelle',level:'Nationale',next:'Webinaire d’entrée le 22 avril à 19:00',entry:'Participer à une réunion d’introduction ou rejoindre un groupe local impliqué.',desc:'Campagne de diffusion et d’éducation populaire autour des propositions du Réseau Salariat.'},
+{id:'c2',title:'Cycle local d’accueil et de lecture',level:'Locale',next:'Séance de lancement à Marseille le 20 avril',entry:'Venir à la première rencontre et se signaler à l’accueil.',desc:'Relier premières lectures, rencontres réelles et engagement progressif.'}
+];
+const resources=[
+['Comprendre le Réseau Salariat en 10 minutes','Présentation synthétique du cadre politique.'],
+['Venir à une première rencontre','À quoi s’attendre et comment poursuivre.'],
+['Repères sur le salaire à vie','Quelques notions de base pour entrer dans les discussions.']
+];
+const leads=[
+['Élise Martin','Paris','Nouveau contact','Envoyer le message d’accueil et proposer la rencontre du 14 avril.'],
+['Romain Petit','Lyon','Venue prévue','Confirmer l’horaire et envoyer le guide première rencontre.'],
+['Nadia Benali','Marseille','À relancer','Proposer la tournée d’information du 20 avril.']
+];
+const tabs=[
+['accueil','⌂','Accueil'],
+['groupes','⌖','Groupes'],
+['agenda','◷','Agenda'],
+['campagnes','✦','Campagnes'],
+['ressources','☰','Ressources'],
+['accueilLocal','❤','Accueil']
+];
+let selectedGroup='g1', selectedEvent='e1', planned=[], joined=[];
+function byId(arr,id){return arr.find(x=>x.id===id)}
+function showTab(tab){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('view-'+tab).classList.remove('hidden');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='groupes') renderGroupes(); if(tab==='agenda') renderAgenda();}
+function setupNav(){document.getElementById('nav').innerHTML=tabs.map(([id,icon,label],i)=>`<button data-tab="${id}" class="${i===0?'active':''}"><span class="icon">${icon}</span><span>${label}</span></button>`).join('');document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));}
+function renderAccueil(){document.getElementById('view-accueil').innerHTML=`
+  <div class="card">
+    <div class="badge">Parcours d’entrée</div>
+    <h2 style="margin-top:12px">Découvrir, puis venir</h2>
+    <p class="sub">L’application sert à trouver un groupe, voir un rendez-vous, rejoindre une campagne et mieux accueillir. Pas à remplacer la vie réelle du mouvement.</p>
+    <div class="stack" style="margin-top:14px">
+      <button class="primary" onclick="showTab('agenda')">Voir la prochaine rencontre</button>
+      <button class="secondary" onclick="showTab('groupes')">Chercher un groupe près de moi</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="stack">
+      <div class="item"><h3>1. Comprendre</h3><p class="muted" style="margin-top:6px">Une base courte pour se repérer sans se perdre.</p></div>
+      <div class="item"><h3>2. Trouver</h3><p class="muted" style="margin-top:6px">Identifier un groupe ou une activité proche.</p></div>
+      <div class="item"><h3>3. Venir</h3><p class="muted" style="margin-top:6px">Recevoir les informations utiles avant la première venue.</p></div>
+    </div>
+  </div>`;
+}
+function renderGroupes(){const g=byId(groups,selectedGroup);document.getElementById('view-groupes').innerHTML=`
+  <input class="search" placeholder="Ville, groupe, accueil…" />
+  ${groups.map(x=>`<div class="item ${x.id===selectedGroup?'active':''}" onclick="selectedGroup='${x.id}';renderGroupes()"><div class="row"><div><h3>${x.name}</h3><p class="muted" style="margin-top:6px">${x.area} · ${x.city}</p></div><div class="tag-row">${x.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div><p class="${x.id===selectedGroup?'':'muted'}" style="margin-top:10px;line-height:1.6">${x.welcome}</p></div>`).join('')}
+  <div class="card"><h2>${g.name}</h2><p class="sub">${g.welcome}</p><div class="item" style="margin-top:12px"><strong>Contact d’accueil</strong><p class="muted" style="margin-top:8px">${g.contact}</p></div></div>`;}
+function renderAgenda(){const e=byId(events,selectedEvent);document.getElementById('view-agenda').innerHTML=`
+  ${events.map(x=>`<div class="item ${x.id===selectedEvent?'active':''}" onclick="selectedEvent='${x.id}';renderAgenda()"><div class="row"><div><h3>${x.title}</h3><p class="muted" style="margin-top:6px">${x.date} · ${x.time} · ${x.city}</p></div><span class="tag">${x.type}</span></div>${planned.includes(x.id)?`<div style="margin-top:10px" class="tag">Intérêt enregistré</div>`:''}</div>`).join('')}
+  <div class="card"><h2>${e.title}</h2><p class="sub">${e.description}</p><div class="item" style="margin-top:12px"><strong>Lieu</strong><p class="muted" style="margin-top:8px">${e.location}</p></div>${e.first?`<div class="item" style="margin-top:12px"><strong>Première venue</strong><p class="muted" style="margin-top:8px">${e.first}</p></div>`:''}<button class="primary" style="margin-top:12px" onclick="if(!planned.includes('${e.id}')) planned.push('${e.id}'); renderAgenda()">${planned.includes(e.id)?'Déjà prévu':'Je viens à cette rencontre'}</button></div>`;}
+function renderCampagnes(){document.getElementById('view-campagnes').innerHTML=campaigns.map(c=>`<div class="card"><div class="row"><div><h2>${c.title}</h2><p class="muted" style="margin-top:6px">${c.level}</p></div><span class="tag">${c.level}</span></div><p class="sub">${c.desc}</p><div class="item" style="margin-top:12px"><strong>Point d’entrée</strong><p class="muted" style="margin-top:8px">${c.entry}</p></div><div class="item" style="margin-top:12px"><strong>Prochaine action</strong><p class="muted" style="margin-top:8px">${c.next}</p></div><button class="primary" style="margin-top:12px" onclick="if(!joined.includes('${c.id}')) joined.push('${c.id}'); this.textContent='Participation signalée'">${joined.includes(c.id)?'Participation signalée':'Je rejoins cette campagne'}</button></div>`).join('');}
+function renderRessources(){document.getElementById('view-ressources').innerHTML=`<div class="card"><h2>Ressources de base</h2><p class="sub">Un socle court pour aider à comprendre, venir et poursuivre.</p><div class="stack" style="margin-top:12px">${resources.map(r=>`<div class="item"><strong>${r[0]}</strong><p class="muted" style="margin-top:8px;line-height:1.6">${r[1]}</p></div>`).join('')}</div></div>`;}
+function renderAccueilLocal(){document.getElementById('view-accueilLocal').innerHTML=`<div class="card"><h2>J’aide à accueillir</h2><p class="sub">Suivi léger des nouvelles personnes, sans logique de CRM lourd.</p><div class="stack" style="margin-top:12px">${leads.map(l=>`<div class="item"><div class="row"><div><strong>${l[0]}</strong><p class="muted" style="margin-top:6px">${l[1]}</p></div><span class="tag">${l[2]}</span></div><p class="muted" style="margin-top:10px;line-height:1.6">${l[3]}</p><div class="small-actions"><button class="small-btn">Prévoir</button><button class="small-btn">Venue</button><button class="small-btn">Relancer</button></div></div>`).join('')}</div></div><div class="card"><div class="item">Suivi léger des premiers contacts seulement.</div><div class="item" style="margin-top:10px">Pas de scoring, pas de réputation, pas de surveillance.</div></div>`;}
+setupNav(); renderAccueil(); renderGroupes(); renderAgenda(); renderCampagnes(); renderRessources(); renderAccueilLocal();
+</script>
+</body>
+</html>
